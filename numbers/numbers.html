@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<canvas width=1920 height=500 id="canvasDiv"></canvas>
+	<script type="text/javascript">
+		var canvasDiv = document.getElementById("canvasDiv");
+		var ctx = canvasDiv.getContext('2d');
+		canvasDiv.width = window.innerWidth;
+		function plusMinus(){
+			var temp = Math.random();
+			if(temp>=0.5){
+				return 1;
+			}else{
+				return -1;
+			}
+		}
+		function randomChar() {
+			var str = "ZXCVBNM<>?:LKJHGFDSAQWERTYUIOP{}|!@#$%^&*()_+12345678901234567890123456789012345678901234567890";
+			var len = str.length;
+			var key = Math.floor(Math.random()*len);
+			return str[key];
+		}
+		var numStatus = function(){
+			var canvasWidth = canvasDiv.width;
+			var canvasHeight = canvasDiv.height;
+			this.xp = Math.random()*canvasWidth;
+			this.dx = plusMinus()*Math.random()*0.05;
+			this.yp = Math.random()*canvasHeight;
+			this.dy = plusMinus()*Math.random()*0.05;
+			this.deg = Math.random()*360;
+			this.ddeg = plusMinus()*Math.random();
+			this.rotate = plusMinus()*Math.random();
+			this.drotate = plusMinus()*Math.random()*0.02;
+			this.font = 20*Math.random()+10;
+			this.text = randomChar();
+			numStatus.prototype.upDate = function() {
+				if(this.xp+this.dx>canvasWidth || this.xp+this.dx<0){
+					this.dx = -this.dx*Math.random()*1.2;
+					this.ddeg = plusMinus()*Math.random();
+					this.drotate = this.drotate*Math.random()*1.2;
+				}
+				if(this.yp+this.dy>canvasHeight || this.yp+this.dy<0){
+					this.dy = -this.dy*Math.random()*1.2;
+					this.ddeg = plusMinus()*Math.random();
+					this.drotate = this.drotate*Math.random()*1.2;
+				}
+				if(this.rotate + this.drotate >1 || this.rotate + this.drotate <-1){
+					this.drotate = -this.drotate*Math.random()*1.2;
+				}
+				this.xp = this.dx + this.xp;
+				this.yp = this.dy + this.yp;
+				this.deg = this.deg%360 + this.ddeg;
+				this.rotate = this.rotate + this.drotate;
+			};
+			numStatus.prototype.draw = function(){
+				var matrix = [this.rotate*Math.cos(this.deg*Math.PI/180),-Math.sin(this.deg*Math.PI/180),Math.sin(this.deg*Math.PI/180),Math.cos(this.deg*Math.PI/180)];
+				ctx.setTransform(matrix[0],matrix[1],matrix[2],matrix[3],this.xp,this.yp);
+				ctx.font= this.font+"px 宋体";
+				ctx.fillStyle = "#b7afd4b5";
+				ctx.fillText(this.text,-2,-2);
+			}
+		}
+		var nums = [];
+		for(var i = 0;i<80;i++){
+			nums.push(new numStatus());
+		}
+		function initCanvas(){
+			requestAnimationFrame(initCanvas);
+			canvasDiv.width = canvasDiv.width;
+			for(let num of nums){
+				num.upDate();
+				num.draw();
+			}
+		}
+		initCanvas();
+	</script>
+</body>
+</html>
